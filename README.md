@@ -15,6 +15,6 @@ AUTHOR -SARVESH BHILARE
 <h2>hi</h2>
 <p>sample paragraph</p>
 <a href="https://www.google.com/"> Google</a>
-<a href="/infinite "> go to infinite</a>
+<a href="/infinity"> go to infinity</a>
 </body>
 </html>
