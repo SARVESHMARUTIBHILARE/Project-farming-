@@ -8,7 +8,6 @@ AUTHOR -SARVESH BHILARE
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatiable" content="IE=edge">
 <meta name="viewport " content="width=device-width, intial scale">
-<title>this is my first project</title>
 </head>
 <body>
 <h1>welcome to my project </h1>
