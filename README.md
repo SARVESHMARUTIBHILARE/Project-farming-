@@ -15,6 +15,8 @@ AUTHOR -SARVESH BHILARE
 <p>sample paragraph</p>
 <a href="https://www.google.com/"> Google</a> 
 <br>
-<a href="words"> go to words </a>
+with open('data.txt', 'r') as file:
+    content = file.read()
+    print(content)
 </body>
 </html>
