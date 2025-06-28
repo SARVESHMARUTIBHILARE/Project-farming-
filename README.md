@@ -13,7 +13,9 @@ AUTHOR -SARVESH BHILARE
 <h1>welcome to my project </h1>
 <h2>hi</h2>
 <p>sample paragraph</p>
-<a href="https://www.google.com/"> Google</a>
+<a href="https://www.google.com/"> Google</a> 
+<br>
 <a href="words"> go to words </a>
+<\br>
 </body>
 </html>
