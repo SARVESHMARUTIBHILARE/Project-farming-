@@ -1,1 +1,541 @@
 <! DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senckt Authentication</title>
+    <style>
+        :root {
+            --primary-gradient-start: #00dbde;
+            --primary-gradient-end: #fc00ff;
+            --dark-bg: #0f0e17;
+            --nav-bg-start: #1a1a2e;
+            --nav-bg-end: #16213e;
+            --card-bg: rgba(26, 26, 46, 0.8);
+            --text-light: #fffffe;
+            --text-muted: #a7a9be;
+            --error-color: #ff6b6b;
+            --success-color: #4cc9f0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: var(--dark-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-light);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(252, 0, 255, 0.3);
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+        
+        .auth-box {
+            background: linear-gradient(135deg, var(--nav-bg-start), var(--nav-bg-end));
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            border: 1px solid rgba(252, 0, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-title {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .auth-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(15, 14, 23, 0.8);
+            border: 1px solid rgba(0, 218, 222, 0.3);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: rgba(252, 0, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(252, 0, 255, 0.1);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 42px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            color: var(--text-light);
+            box-shadow: 0 4px 15px rgba(252, 0, 255, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(252, 0, 255, 0.4);
+        }
+        
+        .form-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .auth-link {
+            color: var(--primary-gradient-end);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .password-strength {
+            height: 5px;
+            background: #eee;
+            margin-top: 5px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .strength-meter {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background 0.3s;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(252, 0, 255, 0.2);
+        }
+        
+        .auth-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
+        .auth-tab.active {
+            color: var(--text-light);
+            border-bottom: 2px solid var(--primary-gradient-end);
+        }
+        
+        .help-section {
+            display: none;
+            padding: 20px;
+            background: rgba(15, 14, 23, 0.5);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .help-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(252, 0, 255, 0.1);
+            padding-bottom: 20px;
+        }
+        
+        .help-item h3 {
+            color: var(--primary-gradient-end);
+            margin-bottom: 10px;
+        }
+        
+        .help-item p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">senckt</div>
+        
+        <div class="auth-box">
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="showForm('loginForm')">Sign In</div>
+                <div class="auth-tab" onclick="showForm('registerForm')">Create Account</div>
+            </div>
+            
+            <div class="success-message" id="successMessage"></div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="auth-header">
+                    <h2 class="auth-title">Sensor Dashboard</h2>
+                    <p class="auth-subtitle">Access your sensor network</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginEmail" class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="admin@senckt.com" required>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword" class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁️</button>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="btn">Sign In</button>
+                
+                <div class="form-footer">
+                    <a href="#" onclick="showForm('forgotForm')">Forgot password?</a> | 
+                    <a href="#" onclick="showForm('helpSection')">Need help?</a>
+                </div>
+            </form>
+            
+            <!-- Registration Form -->
+            <form id="registerForm" style="display: none;" onsubmit="handleRegister(event)">
+                <div class="auth-header">
+                    <h2 class="auth-title">Create Account</h2>
+                    <p class="auth-subtitle">Join our sensor network</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regName" class="form-label">Full Name</label>
+                    <input type="text" id="regName" class="form-control" placeholder="Sensor Administrator" required>
+                    <div class="error-message" id="regNameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail" class="form-label">Email Address</label>
+                    <input type="email" id="regEmail" class="form-control" placeholder="admin@yourcompany.com" required>
+                    <div class="error-message" id="regEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword" class="form-label">Password</label>
+                    <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required oninput="checkPasswordStrength(this.value)">
+                    <div class="password-strength">
+                        <div class="strength-meter" id="strengthMeter"></div>
+                    </div>
+                    <div class="error-message" id="regPasswordError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" class="form-control" placeholder="••••••••" required>
+                    <div class="error-message" id="regConfirmPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="btn">Create Account</button>
+                
+                <div class="form-footer">
+                    Already have an account? <a href="#" onclick="showForm('loginForm')">Sign In</a>
+     
+     
+     
+    <a href="anzard"></a>
+                </div>
+            </form>
+            
+            <!-- Forgot Password Form -->
+            <form id="forgotForm" style="display: none;" onsubmit="handleForgotPassword(event)">
+                <div class="auth-header">
+                    <h2 class="auth-title">Reset Password</h2>
+                    <p class="auth-subtitle">We'll send you a reset link</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="forgotEmail" class="form-label">Email Address</label>
+                    <input type="email" id="forgotEmail" class="form-control" placeholder="admin@senckt.com" required>
+                    <div class="error-message" id="forgotEmailError"></div>
+                </div>
+                
+                <button type="submit" class="btn">Send Reset Link</button>
+                
+                <div class="form-footer">
+                    Remember your password? <a href="#" onclick="showForm('loginForm')">Sign In</a>
+                </div>
+            </form>
+            
+            <!-- Help Section -->
+            <div class="help-section" id="helpSection">
+                <div class="help-item">
+                    <h3>Account Creation</h3>
+                    <p>Fill out all fields in the registration form. You'll receive a verification email to activate your account.</p>
+                </div>
+                
+                <div class="help-item">
+                    <h3>Password Requirements</h3>
+                    <p>Use at least 8 characters with a mix of uppercase, lowercase, numbers, and special characters.</p>
+                </div>
+                
+                <div class="help-item">
+                    <h3>Forgot Password</h3>
+                    <p>Enter your email in the password reset form. Check your inbox for the reset link.</p>
+                </div>
+                
+                <div class="help-item">
+                    <h3>Contact Support</h3>
+                    <p>Email support@senckt.com or call +1 (800) SEN-CKT1 for assistance.</p>
+                </div>
+                
+                <div class="form-footer">
+                    <a href="#" onclick="showForm('loginForm')">Back to login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show different forms
+        function showForm(formId) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotForm').style.display = 'none';
+            document.getElementById('helpSection').style.display = 'none';
+            
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(formId).style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            
+            // Activate corresponding tab
+            if (formId === 'loginForm') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+            } else if (formId === 'registerForm') {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+            }
+        }
+        
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            const meter = document.getElementById('strengthMeter');
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 1;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+            if (password.match(/\d/)) strength += 1;
+            if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+            
+            meter.style.width = `${strength * 25}%`;
+            
+            if (strength <= 1) {
+                meter.style.backgroundColor = 'var(--error-color)';
+            } else if (strength === 2) {
+                meter.style.backgroundColor = '#ffcc00';
+            } else {
+                meter.style.backgroundColor = 'var(--success-color)';
+            }
+        }
+        
+        // Show error message
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+        
+        // Clear error message
+        function clearError(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+        
+        // Validate email format
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+        
+        // Form handlers
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            clearError('loginEmailError');
+            clearError('loginPasswordError');
+            
+            if (!email) {
+                showError('loginEmailError', 'Email is required');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showError('loginEmailError', 'Invalid email format');
+                return;
+            }
+            
+            if (!password) {
+                showError('loginPasswordError', 'Password is required');
+                return;
+            }
+            
+            // Simulate successful login
+            document.getElementById('successMessage').textContent = 'Login successful! Redirecting...';
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                alert('Redirecting to dashboard...');
+            }, 1500);
+        }
+        
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            clearError('regNameError');
+            clearError('regEmailError');
+            clearError('regPasswordError');
+            clearError('regConfirmPasswordError');
+            
+            if (!name) {
+                showError('regNameError', 'Name is required');
+                return;
+            }
+            
+            if (!email) {
+                showError('regEmailError', 'Email is required');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showError('regEmailError', 'Invalid email format');
+                return;
+            }
+            
+            if (!password) {
+                showError('regPasswordError', 'Password is required');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showError('regPasswordError', 'Password must be 8+ characters');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('regConfirmPasswordError', 'Passwords do not match');
+                return;
+            }
+            
+            // Simulate successful registration
+            document.getElementById('successMessage').textContent = 'Account created! Check your email to verify.';
+            document.getElementById('successMessage').style.display = 'block';
+            e.target.reset();
+            document.getElementById('strengthMeter').style.width = '0%';
+        }
+        
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value;
+            
+            clearError('forgotEmailError');
+            
+            if (!email) {
+                showError('forgotEmailError', 'Email is required');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showError('forgotEmailError', 'Invalid email format');
+                return;
+            }
+            
+            // Simulate successful password reset
+            document.getElementById('successMessage').textContent = 'Reset link sent to your email!';
+            document.getElementById('successMessage').style.display = 'block';
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>
+
